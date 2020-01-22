@@ -10,46 +10,41 @@ namespace IssueDashboard.Data
     {
         private readonly GitHubClient gitHubClient;
 
-        private Dictionary<(string org, string repo), (DateTimeOffset time, Repository repo)> cache = new Dictionary<(string org, string repo), (DateTimeOffset time, Repository repo)>();
+        private Dictionary<(string org, string repo), (DateTimeOffset time, Task<Repository> repo)> cache = new Dictionary<(string org, string repo), (DateTimeOffset time, Task<Repository> repo)>();
 
         public IssuesByRepository(GitHubClient gitHubClient)
         {
             this.gitHubClient = gitHubClient;
-            var _ = Prepopulate();
+            Prepopulate();
         }
 
-        private async Task Prepopulate()
+        private void Prepopulate()
         {
-            var tasks = new List<Task<Repository>>(4)
+            foreach (var key in new(string org, string name)[] { ("dotnet", "aspnetcore"), ("dotnet", "extensions"), ("dotnet", "efcore"), ("dotnet", "ef6")})
             {
-                GetRepositoryCore("dotnet", "aspnetcore"),
-                GetRepositoryCore("dotnet", "extensions"),
-                GetRepositoryCore("dotnet", "efcore"),
-                GetRepositoryCore("dotnet", "ef6"),
-            };
-
-            while (tasks.Any())
-            {
-                var t = await Task.WhenAny(tasks);
-                var repo = await t;
-                cache[(repo.Organization, repo.Name)] = (DateTimeOffset.UtcNow, repo);
-                tasks.Remove(t);
+                cache[key] = (DateTimeOffset.UtcNow, GetRepositoryCore(key.org, key.name));
             }
-
         }
 
         public async Task<Repository> GetRepository(string organization, string name)
         {
             var key = (organization, name);
-            if (!cache.TryGetValue(key, out var value) ||
-                DateTimeOffset.UtcNow - value.time > TimeSpan.FromMinutes(5))
+            Task<Repository> repoTask;
+            lock (this.cache)
             {
-                value.repo = await GetRepositoryCore(organization, name);
-                value.time = DateTimeOffset.UtcNow;
-                cache[key] = value;
+                if (!cache.TryGetValue(key, out var value) ||
+                    value.repo.IsFaulted ||
+                    DateTimeOffset.UtcNow - value.time > TimeSpan.FromMinutes(15))
+                {
+                    value.repo = GetRepositoryCore(organization, name);
+                    value.time = DateTimeOffset.UtcNow;
+                    cache[key] = value;
+                }
+
+                repoTask = value.repo;
             }
 
-            return value.repo;
+            return await repoTask;
         }
 
         private async Task<Repository> GetRepositoryCore(string organization, string name)
@@ -60,7 +55,16 @@ namespace IssueDashboard.Data
             };
 
             var milestones = new Dictionary<string, Milestone>();
-            var issues = await gitHubClient.Issue.GetAllForRepository(organization, name, issueRequest);
+            IReadOnlyList<Issue> issues = Array.Empty<Issue>();
+            try
+            {
+                issues = await gitHubClient.Issue.GetAllForRepository(organization, name, issueRequest);
+            }
+            catch (Exception)
+            {
+
+            }
+
             foreach (var issue in issues)
             {
                 var key = "(No Milestone)";

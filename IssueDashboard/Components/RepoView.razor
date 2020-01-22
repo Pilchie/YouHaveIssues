@@ -5,6 +5,11 @@
 {
     <em>Loading...</em>
 }
+else if (Repository.Exception != null)
+{
+    <h1>There was an error fetching this repository:</h1>
+    <p>@Repository.Exception.ToString()</p>
+}
 else
 {
     <div class="card-deck">

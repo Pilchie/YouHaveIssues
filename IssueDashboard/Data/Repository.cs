@@ -10,6 +10,8 @@ namespace IssueDashboard.Data
     {
         private readonly Lazy<IEnumerable<string>> allAreas;
 
+        public Exception Exception { get; }
+
         public string Organization { get; }
 
         public string Name { get; }
@@ -26,6 +28,11 @@ namespace IssueDashboard.Data
 
             this.allAreas = new Lazy<IEnumerable<string>>(() =>
                 new HashSet<string>(Milestones.SelectMany(m => m.Areas.Keys).OrderBy(a => a).ToList()));
+        }
+
+        public Repository(Exception exception)
+        {
+            this.Exception = exception;
         }
     }
 }
