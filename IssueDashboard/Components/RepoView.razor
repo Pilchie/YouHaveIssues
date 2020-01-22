@@ -1,0 +1,42 @@
+﻿@page "/{Organization}/{Name}"
+@using IssueDashboard.Data
+@inject IssuesByRepository IssuesByRepository
+
+@if (Repository == null)
+{
+    <em>Loading...</em>
+}
+else
+{
+    <div class="card-deck">
+        @foreach (var m in Repository.Milestones)
+        {
+            <div class="card">
+                <div class="card-body"><h5 class="card-title">@m.Name</h5></div>
+            </div>
+            foreach (var a in m.Areas.Values.OrderBy(a => a.Name))
+            {
+                <div class="card">
+                    <div class="card-header">@a.Name</div>
+                    <div class="card-body"><h5 class="card-title">@a.Count</h5></div>
+                </div>
+            }
+
+            <div class="w-100"></div>
+        }
+    </div>
+}
+
+@code {
+
+    [Parameter] public string Organization { get; set; }
+
+    [Parameter] public string Name { get; set; }
+
+    protected Repository Repository { get; private set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Repository = await IssuesByRepository.GetRepository(Organization, Name);
+    }
+}

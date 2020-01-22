@@ -29,11 +29,11 @@ namespace IssueDashboard
             services.AddRazorPages();
             services.AddServerSideBlazor();
 
-            var client = new GitHubClient(new ProductHeaderValue("GitHubDashboard"))
+            var gitHubClient = new GitHubClient(new ProductHeaderValue("GitHubDashboard"))
             {
                 Credentials = new Credentials(Configuration["GitHubToken"])
             };
-            services.AddSingleton(new Data.Repository("dotnet", "aspnetcore", client));
+            services.AddSingleton(new Data.IssuesByRepository(gitHubClient));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

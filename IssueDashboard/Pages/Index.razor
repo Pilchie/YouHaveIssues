@@ -1,25 +1,3 @@
 ﻿@page "/"
-@inject IssueDashboard.Data.Repository Repository
 
-<table>
-    <thead>
-        <tr>
-            <th>Milestone</th>
-            <th>Area</th>
-            <th>Count</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var m in Repository.Milestones)
-        {
-            foreach (var a in m.Areas.Values)
-            {
-                <tr>
-                    <td>@m.Name</td>
-                    <td>@a.Name</td>
-                    <td>@a.Count</td>
-                </tr>
-            }
-        }
-    </tbody>
-</table>
+<p>Pick one of the repositories at left.</p>
