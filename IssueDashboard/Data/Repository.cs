@@ -8,17 +8,24 @@ namespace IssueDashboard.Data
 {
     public class Repository
     {
+        private readonly Lazy<IEnumerable<string>> allAreas;
+
         public string Organization { get; }
 
         public string Name { get; }
 
         public IList<Milestone> Milestones { get; }
 
+        public IEnumerable<string> AllAreas => allAreas.Value;
+
         public Repository(string organization, string name, IList<Milestone> milestones)
         {
             Organization = organization;
             Name = name;
             this.Milestones = milestones;
+
+            this.allAreas = new Lazy<IEnumerable<string>>(() =>
+                new HashSet<string>(Milestones.SelectMany(m => m.Areas.Keys).OrderBy(a => a).ToList()));
         }
     }
 }

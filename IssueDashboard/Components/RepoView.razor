@@ -1,5 +1,4 @@
-﻿@page "/{Organization}/{Name}"
-@using IssueDashboard.Data
+﻿@using IssueDashboard.Data
 @inject IssuesByRepository IssuesByRepository
 
 @if (Repository == null)
@@ -14,11 +13,11 @@ else
             <div class="card">
                 <div class="card-body"><h5 class="card-title">@m.Name</h5></div>
             </div>
-            foreach (var a in m.Areas.Values.OrderBy(a => a.Name))
+            foreach (var a in Repository.AllAreas)
             {
                 <div class="card">
-                    <div class="card-header">@a.Name</div>
-                    <div class="card-body"><h5 class="card-title">@a.Count</h5></div>
+                    <div class="card-header">@a</div>
+                    <div class="card-body"><h5 class="card-title">@(m.Areas.TryGetValue(a, out var area) ? area.Count : 0)</h5></div>
                 </div>
             }
 
