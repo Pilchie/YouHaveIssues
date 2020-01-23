@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Octokit;
 
-namespace IssueDashboard
+namespace YouHaveIssues
 {
     public class Startup
     {

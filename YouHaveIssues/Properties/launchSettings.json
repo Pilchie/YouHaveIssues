@@ -15,7 +15,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "IssueDashboard": {
+    "YouHaveIssues": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
