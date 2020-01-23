@@ -87,6 +87,8 @@ namespace IssueDashboard.Data
                     milestones[key] = milestone;
                 }
 
+                milestone.TotalCount++;
+
                 var areas = issue.Labels.Select(l => l.Name).Where(l => l.StartsWith("area-")).ToList();
                 if (!areas.Any())
                 {

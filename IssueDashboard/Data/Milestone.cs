@@ -11,7 +11,7 @@ namespace IssueDashboard.Data
 
         public IDictionary<string, Query> Areas { get; } = new Dictionary<string, Query>();
 
-        public int TotalCount => Areas.Values.Sum(a => a.Count);
+        public int TotalCount { get; set; }
 
         public Milestone(string name)
         {
