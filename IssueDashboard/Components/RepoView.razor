@@ -93,16 +93,23 @@ else
     {
         var m = milestone.Name == IssuesByRepository.NoMilestone
             ? $"no%3Amilestone"
-            : $"milestone%3A{milestone.Name}";
+            : $"milestone%3A{Escape(milestone.Name)}";
         return $"https://github.com/{Repository.Organization}/{Repository.Name}/issues?q=is%3Aopen+is%3Aissue+{m}";
     }
 
     private string LinkFor(Milestone milestone, string areaName)
     {
         var a = areaName == IssuesByRepository.NoArea
-            ? $"-label%3A{string.Join("+-label%3A", Repository.AllAreas.Except(new[] {IssuesByRepository.NoArea}))}"
+            ? $"-label%3A{string.Join("+-label%3A", Repository.AllAreas.Except(new[] {IssuesByRepository.NoArea}).Select(a => Escape(a)))}"
             : $"label%3A{areaName}";
         return $"{LinkFor(milestone)}+{a}";
+    }
+
+    private string Escape(string s)
+    {
+        return s.Contains(' ')
+            ? $"\"{s.Replace(' ', '+')}\""
+            : s;
     }
 
 }
