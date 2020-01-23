@@ -38,12 +38,12 @@ else
                     <div class="card-body"><h5 class="card-title text-center">@m.Name</h5></div>
                 </div>
                 <div class="card @BackgroundFor(m.TotalCount)">
-                    <div class="card-body"><h5 class="card-title text-center">@m.TotalCount</h5></div>
+                    <div class="card-body"><a href=@LinkFor(m) target="_blank"><h5 class="card-title text-center">@m.TotalCount</h5></a></div>
                 </div>
                 @foreach (var a in Repository.AllAreas)
                 {
                     <div class="card @BackgroundFor(m, a)">
-                        <div class="card-body"><h5 class="card-title text-center">@(m.Areas.TryGetValue(a, out var area) ? area.Count : 0)</h5></div>
+                        <div class="card-body"><a href=@LinkFor(m, a) target="_blank"><h5 class="card-title text-center">@(m.Areas.TryGetValue(a, out var area) ? area.Count : 0)</h5></a></div>
                     </div>
                 }
 
@@ -88,4 +88,21 @@ else
             ? "bg-success"
             : null;
     }
+
+    private string LinkFor(Milestone milestone)
+    {
+        var m = milestone.Name == IssuesByRepository.NoMilestone
+            ? $"no%3Amilestone"
+            : $"milestone%3A{milestone.Name}";
+        return $"https://github.com/{Repository.Organization}/{Repository.Name}/issues?q=is%3Aopen+is%3Aissue+{m}";
+    }
+
+    private string LinkFor(Milestone milestone, string areaName)
+    {
+        var a = areaName == IssuesByRepository.NoArea
+            ? $"-label%3A{string.Join("+-label%3A", Repository.AllAreas.Except(new[] {IssuesByRepository.NoArea}))}"
+            : $"label%3A{areaName}";
+        return $"{LinkFor(milestone)}+{a}";
+    }
+
 }

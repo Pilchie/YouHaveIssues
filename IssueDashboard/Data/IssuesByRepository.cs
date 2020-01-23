@@ -8,6 +8,9 @@ namespace IssueDashboard.Data
 {
     public class IssuesByRepository
     {
+        public const string NoMilestone = "(No Milestone)";
+        public const string NoArea = "(No Area)";
+
         private readonly GitHubClient gitHubClient;
 
         private Dictionary<(string org, string repo), (DateTimeOffset time, Task<Repository> repo)> cache = new Dictionary<(string org, string repo), (DateTimeOffset time, Task<Repository> repo)>();
@@ -60,14 +63,19 @@ namespace IssueDashboard.Data
             {
                 issues = await gitHubClient.Issue.GetAllForRepository(organization, name, issueRequest);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-
+                return new Repository(e);
             }
 
             foreach (var issue in issues)
             {
-                var key = "(No Milestone)";
+                if (issue.PullRequest != null)
+                {
+                    continue;
+                }
+
+                var key = NoMilestone;
                 if (issue.Milestone != null)
                 {
                     key = issue.Milestone.Title;
@@ -82,7 +90,7 @@ namespace IssueDashboard.Data
                 var areas = issue.Labels.Select(l => l.Name).Where(l => l.StartsWith("area-")).ToList();
                 if (!areas.Any())
                 {
-                    areas.Add("(No Area)");
+                    areas.Add(NoArea);
                 }
 
                 foreach (var area in areas)
