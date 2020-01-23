@@ -181,3 +181,8 @@ app {
         display: block;
     }
 }
+
+.card {
+    height: 75px;
+    width: 210px;
+}

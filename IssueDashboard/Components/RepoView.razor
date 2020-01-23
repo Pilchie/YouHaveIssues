@@ -13,20 +13,41 @@ else if (Repository.Exception != null)
 else
 {
     <div class="card-deck">
-        @foreach (var m in Repository.Milestones)
-        {
+        <div class="row flex-nowrap" style="margin-bottom: 10px;">
             <div class="card">
-                <div class="card-body"><h5 class="card-title">@m.Name</h5></div>
+                <div class="card-body"></div>
             </div>
-            foreach (var a in Repository.AllAreas)
+
+            <div class="card bg-dark text-white">
+                <div class="card-body"><h5 class="card-title text-center">All</h5></div>
+            </div>
+
+
+            @foreach (var a in Repository.AllAreas)
             {
-                <div class="card">
-                    <div class="card-header">@a</div>
-                    <div class="card-body"><h5 class="card-title">@(m.Areas.TryGetValue(a, out var area) ? area.Count : 0)</h5></div>
+                <div class="card bg-dark text-white">
+                    <div class="card-body"><h5 class="card-title text-center">@AreaName(a)</h5></div>
                 </div>
             }
+        </div>
 
-            <div class="w-100"></div>
+        @foreach (var m in Repository.Milestones)
+        {
+            <div class="row flex-nowrap" style="margin-bottom: 10px;">
+                <div class="card bg-dark text-white">
+                    <div class="card-body"><h5 class="card-title text-center">@m.Name</h5></div>
+                </div>
+                <div class="card @BackgroundFor(m.TotalCount)">
+                    <div class="card-body"><h5 class="card-title text-center">@m.TotalCount</h5></div>
+                </div>
+                @foreach (var a in Repository.AllAreas)
+                {
+                    <div class="card @BackgroundFor(m, a)">
+                        <div class="card-body"><h5 class="card-title text-center">@(m.Areas.TryGetValue(a, out var area) ? area.Count : 0)</h5></div>
+                    </div>
+                }
+
+            </div>
         }
     </div>
 }
@@ -42,5 +63,29 @@ else
     protected override async Task OnInitializedAsync()
     {
         Repository = await IssuesByRepository.GetRepository(Organization, Name);
+    }
+
+    private string AreaName(string name)
+    {
+        return name.StartsWith("area-")
+            ? name.Substring("area-".Length)
+            : name;
+    }
+
+    private string BackgroundFor(Milestone milestone, string areaName)
+    {
+        if (!milestone.Areas.TryGetValue(areaName, out var query))
+        {
+            return "bg-success";
+        }
+
+        return null;
+    }
+
+    private string BackgroundFor(int count)
+    {
+        return count == 0
+            ? "bg-success"
+            : null;
     }
 }
