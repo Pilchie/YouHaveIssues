@@ -37,6 +37,8 @@ namespace YouHaveIssues.Data
             {
                 if (!cache.TryGetValue(key, out var value) ||
                     value.repo.IsFaulted ||
+                    value.repo.IsCanceled ||
+                    (value.repo.IsCompletedSuccessfully && value.repo.Result.Exception != null) ||
                     DateTimeOffset.UtcNow - value.time > TimeSpan.FromMinutes(15))
                 {
                     value.repo = GetRepositoryCore(organization, name);
