@@ -1,4 +1,5 @@
 ﻿@using YouHaveIssues.Data
+@using Humanizer
 @inject IssuesByRepository IssuesByRepository
 
 @if (Repository == null)
@@ -50,6 +51,8 @@ else
             </div>
         }
     </div>
+
+    <p><em>Rate Limit: @Repository.RateLimit.Remaining / @Repository.RateLimit.Limit (Resets in @((Repository.RateLimit.Reset - DateTimeOffset.UtcNow).Humanize()))</em></p>
 }
 
 @code {
