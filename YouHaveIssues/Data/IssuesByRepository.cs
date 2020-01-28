@@ -61,9 +61,12 @@ namespace YouHaveIssues.Data
 
             var milestones = new Dictionary<string, Milestone>();
             IReadOnlyList<Issue> issues = Array.Empty<Issue>();
+            RateLimit rateLimit;
             try
             {
                 issues = await gitHubClient.Issue.GetAllForRepository(organization, name, issueRequest);
+                var rateLimits = await gitHubClient.Miscellaneous.GetRateLimits();
+                rateLimit = rateLimits.Resources.Core;
             }
             catch (Exception e)
             {
@@ -109,7 +112,7 @@ namespace YouHaveIssues.Data
                 }
             }
 
-            return new Data.Repository(organization, name, milestones.Values.OrderBy(m => m.Name).ToList());
+            return new Data.Repository(organization, name, milestones.Values.OrderBy(m => m.Name).ToList(), rateLimit);
         }
     }
 }

@@ -17,16 +17,17 @@ namespace YouHaveIssues.Data
         public string Name { get; }
 
         public IList<Milestone> Milestones { get; }
+        public RateLimit RateLimit { get; }
 
         public IEnumerable<string> AllAreas => allAreas.Value;
 
-        public Repository(string organization, string name, IList<Milestone> milestones)
+        public Repository(string organization, string name, IList<Milestone> milestones, RateLimit rateLimit)
         {
             Organization = organization;
             Name = name;
-            this.Milestones = milestones;
-
-            this.allAreas = new Lazy<IEnumerable<string>>(() =>
+            Milestones = milestones;
+            RateLimit = rateLimit;
+            allAreas = new Lazy<IEnumerable<string>>(() =>
                 new HashSet<string>(Milestones.SelectMany(m => m.Areas.Keys).OrderBy(a => a).ToList()));
         }
 
