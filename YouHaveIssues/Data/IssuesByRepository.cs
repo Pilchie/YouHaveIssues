@@ -57,8 +57,8 @@ namespace YouHaveIssues.Data
                     (value.repo.IsCompletedSuccessfully && value.repo.Result.Exception != null) ||
                     DateTimeOffset.UtcNow - value.time > TimeSpan.FromMinutes(15))
                 {
-                    value.repo = GetRepositoryCore(organization, name);
                     value.time = DateTimeOffset.UtcNow;
+                    value.repo = GetRepositoryCore(organization, name, value.time);
                     cache[key] = value;
                 }
 
@@ -68,7 +68,7 @@ namespace YouHaveIssues.Data
             return await repoTask;
         }
 
-        private async Task<Repository> GetRepositoryCore(string organization, string name)
+        private async Task<Repository> GetRepositoryCore(string organization, string name, DateTimeOffset refreshTime)
         {
             var issueRequest = new RepositoryIssueRequest
             {
@@ -128,7 +128,8 @@ namespace YouHaveIssues.Data
                 }
             }
 
-            return new Data.Repository(organization, name, milestones.Values.OrderBy(m => m.Name).ToList(), rateLimit);
+            return new Data.Repository(
+                organization, name, milestones.Values.OrderBy(m => m.Name).ToList(), rateLimit, refreshTime);
         }
     }
 }
