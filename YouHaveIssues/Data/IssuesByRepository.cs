@@ -11,6 +11,14 @@ namespace YouHaveIssues.Data
         public const string NoMilestone = "(No Milestone)";
         public const string NoArea = "(No Area)";
 
+        private static readonly (string org, string name)[] KnownRepos = 
+        {
+            ("dotnet", "aspnetcore"),
+            ("dotnet", "extensions"),
+            ("dotnet", "efcore"),
+            ("dotnet", "ef6"),
+        };
+
         private readonly GitHubClient gitHubClient;
 
         private Dictionary<(string org, string repo), (DateTimeOffset time, Task<Repository> repo)> cache = new Dictionary<(string org, string repo), (DateTimeOffset time, Task<Repository> repo)>();
@@ -18,14 +26,22 @@ namespace YouHaveIssues.Data
         public IssuesByRepository(GitHubClient gitHubClient)
         {
             this.gitHubClient = gitHubClient;
-            Prepopulate();
+            var _ = UpdateCachePeriodically();
         }
 
-        private void Prepopulate()
+        private async Task UpdateCachePeriodically()
         {
-            foreach (var key in new(string org, string name)[] { ("dotnet", "aspnetcore"), ("dotnet", "extensions"), ("dotnet", "efcore"), ("dotnet", "ef6")})
+            var tasks = new List<Task>(KnownRepos.Length + 1);
+            while (true)
             {
-                cache[key] = (DateTimeOffset.UtcNow, GetRepositoryCore(key.org, key.name));
+                foreach (var repo in KnownRepos)
+                {
+                    tasks.Add(GetRepository(repo.org, repo.name));
+                }
+
+                tasks.Add(Task.Delay(TimeSpan.FromMinutes(15)));
+                await Task.WhenAll(tasks);
+                tasks.Clear();
             }
         }
 
