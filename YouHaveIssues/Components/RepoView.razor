@@ -52,7 +52,10 @@ else
         }
     </div>
 
-    <p><em>Refreshed @Repository.RefreshTime.Humanize() | Rate Limit: @Repository.RateLimit.Remaining / @Repository.RateLimit.Limit (Resets in @((Repository.RateLimit.Reset - DateTimeOffset.UtcNow).Humanize()))</em></p>
+    <p><em>
+    Refreshed @Repository.RefreshTime.Humanize() | Rate Limit: @Repository.RateLimit.Remaining / @Repository.RateLimit.Limit (Resets in @((Repository.RateLimit.Reset - DateTimeOffset.UtcNow).Humanize())) |
+    Built for branch @(Program.SourceBranch ?? "unknown")@@@(Program.SourceVersion ?? "unknown")
+    </em></p>
 }
 
 @code {
