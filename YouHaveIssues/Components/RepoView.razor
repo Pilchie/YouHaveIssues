@@ -54,7 +54,7 @@ else
 
     <p><em>
     Refreshed @Repository.RefreshTime.Humanize() | Rate Limit: @Repository.RateLimit.Remaining / @Repository.RateLimit.Limit (Resets in @((Repository.RateLimit.Reset - DateTimeOffset.UtcNow).Humanize())) |
-    Built for branch @(Program.SourceBranch ?? "unknown")@@@(Program.SourceVersion ?? "unknown")
+    @GetBuildInfo()
     </em></p>
 }
 
@@ -118,4 +118,19 @@ else
             : s;
     }
 
+    private string GetBuildInfo()
+    {
+        if (Program.SourceVersion == null)
+        {
+            return "Local build";
+        }
+
+        var branch = Program.SourceBranch ?? "unknown";
+
+        if (branch.StartsWith("refs/heads/"))
+            branch = branch.Substring("refs/heads/".Length);
+
+        var sha = Program.SourceVersion?.Substring(0, 6);
+        return $"Built for branch {branch}@{sha}";
+    }
 }
