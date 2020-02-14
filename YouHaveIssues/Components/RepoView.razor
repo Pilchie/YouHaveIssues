@@ -23,7 +23,6 @@ else
                 <div class="card-body"><h5 class="card-title text-center">All</h5></div>
             </div>
 
-
             @foreach (var a in Repository.AllAreas)
             {
                 <div class="card bg-dark text-white">
@@ -39,12 +38,12 @@ else
                     <div class="card-body"><h5 class="card-title text-center">@m.Name</h5></div>
                 </div>
                 <div class="card @BackgroundFor(m.TotalCount)">
-                    <div class="card-body"><a href=@LinkFor(m) target="_blank"><h5 class="card-title text-center">@m.TotalCount</h5></a></div>
+                    <div class="card-body"><a href=@LinkFor(Repository, m) target="_blank"><h5 class="card-title text-center">@m.TotalCount</h5></a></div>
                 </div>
                 @foreach (var a in Repository.AllAreas)
                 {
                     <div class="card @BackgroundFor(m, a)">
-                        <div class="card-body"><a href=@LinkFor(m, a) target="_blank"><h5 class="card-title text-center">@(m.Areas.TryGetValue(a, out var area) ? area.Count : 0)</h5></a></div>
+                        <div class="card-body"><a href=@LinkFor(Repository, m, a) target="_blank"><h5 class="card-title text-center">@(m.Areas.TryGetValue(a, out var area) ? area.Count : 0)</h5></a></div>
                     </div>
                 }
 
@@ -53,32 +52,34 @@ else
     </div>
 
     <p><em>
-    Refreshed @Repository.RefreshTime.Humanize() | Rate Limit: @Repository.RateLimit.Remaining / @Repository.RateLimit.Limit (Resets in @((Repository.RateLimit.Reset - DateTimeOffset.UtcNow).Humanize())) |
-    @GetBuildInfo()
+    Refreshed @Repository.RefreshTime.Humanize() | Rate Limit: @RateLimitInfo(Repository) | @GetBuildInfo()
     </em></p>
 }
 
 @code {
 
-    [Parameter] public string Organization { get; set; }
+    [Parameter] public string? Organization { get; set; }
 
-    [Parameter] public string Name { get; set; }
+    [Parameter] public string? Name { get; set; }
 
-    protected Repository Repository { get; private set; }
+    protected Repository? Repository { get; private set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Repository = await IssuesByRepository.GetRepository(Organization, Name);
+        if (Organization != null && Name != null)
+        {
+            Repository = await IssuesByRepository.GetRepository(Organization, Name);
+        }
     }
 
-    private string AreaName(string name)
+    private static string AreaName(string name)
     {
         return name.StartsWith("area-")
             ? name.Substring("area-".Length)
             : name;
     }
 
-    private string BackgroundFor(Milestone milestone, string areaName)
+    private static string? BackgroundFor(Milestone milestone, string areaName)
     {
         if (!milestone.Areas.TryGetValue(areaName, out var query))
         {
@@ -88,37 +89,37 @@ else
         return null;
     }
 
-    private string BackgroundFor(int count)
+    private static string? BackgroundFor(int count)
     {
         return count == 0
             ? "bg-success"
             : null;
     }
 
-    private string LinkFor(Milestone milestone)
+    private static string LinkFor(Repository repository, Milestone milestone)
     {
         var m = milestone.Name == IssuesByRepository.NoMilestone
             ? $"no%3Amilestone"
             : $"milestone%3A{Escape(milestone.Name)}";
-        return $"https://github.com/{Repository.Organization}/{Repository.Name}/issues?q=is%3Aopen+is%3Aissue+{m}";
+        return $"https://github.com/{repository.Organization}/{repository.Name}/issues?q=is%3Aopen+is%3Aissue+{m}";
     }
 
-    private string LinkFor(Milestone milestone, string areaName)
+    private static string LinkFor(Repository repository, Milestone milestone, string areaName)
     {
         var a = areaName == IssuesByRepository.NoArea
-            ? $"-label%3A{string.Join("+-label%3A", Repository.AllAreas.Except(new[] {IssuesByRepository.NoArea}).Select(a => Escape(a)))}"
+            ? $"-label%3A{string.Join("+-label%3A", repository.AllAreas.Except(new[] {IssuesByRepository.NoArea}).Select(a => Escape(a)))}"
             : $"label%3A{areaName}";
-        return $"{LinkFor(milestone)}+{a}";
+        return $"{LinkFor(repository, milestone)}+{a}";
     }
 
-    private string Escape(string s)
+    private static string Escape(string s)
     {
         return s.Contains(' ')
             ? $"\"{s.Replace(' ', '+')}\""
             : s;
     }
 
-    private string GetBuildInfo()
+    private static string GetBuildInfo()
     {
         if (Program.SourceVersion == null)
         {
@@ -132,5 +133,15 @@ else
 
         var sha = Program.SourceVersion?.Substring(0, 6);
         return $"Built for branch {branch}@{sha}";
+    }
+
+    private static string RateLimitInfo(Repository repository)
+    {
+        if (repository.RateLimit == null)
+        {
+            return "unknown";
+        }
+
+        return $"{repository.RateLimit.Remaining} / {repository.RateLimit.Limit}(Resets in {(repository.RateLimit.Reset - DateTimeOffset.UtcNow).Humanize()})";
     }
 }

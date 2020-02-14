@@ -86,7 +86,7 @@ namespace YouHaveIssues.Data
             }
             catch (Exception e)
             {
-                return new Repository(e);
+                return new Repository(organization, name, e);
             }
 
             foreach (var issue in issues)
