@@ -10,14 +10,14 @@ namespace YouHaveIssues.Data
     {
         private readonly Lazy<IEnumerable<string>> allAreas;
 
-        public Exception Exception { get; }
+        public Exception? Exception { get; }
 
         public string Organization { get; }
 
         public string Name { get; }
 
         public IList<Milestone> Milestones { get; }
-        public RateLimit RateLimit { get; }
+        public RateLimit? RateLimit { get; }
         public DateTimeOffset RefreshTime { get; }
 
         public IEnumerable<string> AllAreas => allAreas.Value;
@@ -33,9 +33,14 @@ namespace YouHaveIssues.Data
                 new HashSet<string>(Milestones.SelectMany(m => m.Areas.Keys).OrderBy(a => a).ToList()));
         }
 
-        public Repository(Exception exception)
+        public Repository(string organization, string name, Exception exception)
         {
+            Organization = organization;
+            Name = name;
             this.Exception = exception;
+
+            Milestones = Array.Empty<Milestone>();
+            allAreas = new Lazy<IEnumerable<string>>(() => Enumerable.Empty<string>());
         }
     }
 }
