@@ -89,7 +89,9 @@ else
     {
         return name.StartsWith("area-")
             ? name.Substring("area-".Length)
-            : name;
+            : name.StartsWith("area: ")
+                ? name.Substring("area: ".Length)
+                : name;
     }
 
     private static string? BackgroundFor(Milestone milestone, string areaName)

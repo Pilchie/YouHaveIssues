@@ -17,6 +17,9 @@ namespace YouHaveIssues.Data
             ("dotnet", "extensions"),
             ("dotnet", "efcore"),
             ("dotnet", "ef6"),
+            ("dotnet", "winforms"),
+            ("dotnet", "winforms-designer"),
+            ("dotnet", "runtime"),
         };
 
         private readonly GitHubClient gitHubClient;
@@ -113,7 +116,11 @@ namespace YouHaveIssues.Data
                 var areas = issue.Labels.Select(l => l.Name).Where(l => l.StartsWith("area-")).ToList();
                 if (!areas.Any())
                 {
-                    areas.Add(NoArea);
+                    areas = issue.Labels.Select(l => l.Name).Where(l => l.StartsWith("area: ")).ToList();
+                    if (!areas.Any())
+                    {
+                        areas.Add(NoArea);
+                    }
                 }
 
                 foreach (var area in areas)
