@@ -19,41 +19,54 @@ else
                 <div class="card-body"></div>
             </div>
 
-            <div class="card bg-dark text-white">
-                <div class="card-body"><h5 class="card-title text-center">All</h5></div>
-            </div>
-
-            @foreach (var a in Repository.AllAreas)
+            @foreach (var m in Repository.Milestones)
             {
-                <div class="card bg-dark text-white">
-                    <div class="card-body"><h5 class="card-title text-center">@AreaName(a)</h5></div>
-                </div>
-            }
-        </div>
-
-        @foreach (var m in Repository.Milestones)
-        {
-            <div class="row flex-nowrap" style="margin-bottom: 10px;">
                 <div class="card bg-dark text-white">
                     <div class="card-body"><h5 class="card-title text-center">@m.Name</h5></div>
                 </div>
+            }
+        </div>
+        <div class="w-100"></div>
+
+        <div class="row flex-nowrap" style="margin-bottom: 10px;">
+            <div class="card bg-dark text-white">
+                <div class="card-body"><h5 class="card-title text-center">All</h5></div>
+            </div>
+            @foreach (var m in Repository.Milestones)
+            {
                 <div class="card @BackgroundFor(m.TotalCount)">
                     <div class="card-body"><a href=@LinkFor(Repository, m) target="_blank"><h5 class="card-title text-center">@m.TotalCount</h5></a></div>
                 </div>
-                @foreach (var a in Repository.AllAreas)
+            }
+
+        </div>
+        <div class="w-100"></div>
+
+
+        @foreach (var a in Repository.AllAreas)
+        {
+            <div class="row flex-nowrap" style="margin-bottom: 10px;">
+                <div class="card bg-dark text-white">
+                    <div class="card-body"><h5 class="card-title text-center">@AreaName(a)</h5></div>
+                </div>
+
+                @foreach (var m in Repository.Milestones)
                 {
                     <div class="card @BackgroundFor(m, a)">
                         <div class="card-body"><a href=@LinkFor(Repository, m, a) target="_blank"><h5 class="card-title text-center">@(m.Areas.TryGetValue(a, out var area) ? area.Count : 0)</h5></a></div>
                     </div>
                 }
-
             </div>
+            <div class="w-100"></div>
+
         }
     </div>
 
-    <p><em>
-    Refreshed @Repository.RefreshTime.Humanize() | Rate Limit: @RateLimitInfo(Repository) | @GetBuildInfo()
-    </em></p>
+    <p>
+        <em>
+            Refreshed @Repository.RefreshTime.Humanize() | Rate Limit: @RateLimitInfo(Repository) | @GetBuildInfo()
+        </em>
+    </p>
 }
 
 @code {
@@ -107,7 +120,7 @@ else
     private static string LinkFor(Repository repository, Milestone milestone, string areaName)
     {
         var a = areaName == IssuesByRepository.NoArea
-            ? $"-label%3A{string.Join("+-label%3A", repository.AllAreas.Except(new[] {IssuesByRepository.NoArea}).Select(a => Escape(a)))}"
+            ? $"-label%3A{string.Join("+-label%3A", repository.AllAreas.Except(new[] { IssuesByRepository.NoArea }).Select(a => Escape(a)))}"
             : $"label%3A{areaName}";
         return $"{LinkFor(repository, milestone)}+{a}";
     }
