@@ -1,8 +1,15 @@
-﻿@using YouHaveIssues.Data
+﻿@page "/"
+@page "/{Organization}/{Name}"
+
+@using YouHaveIssues.Data
 @using Humanizer
 @inject IssuesByRepository IssuesByRepository
 
-@if (Repository == null)
+@if (Organization == null || Name == null)
+{
+    <p>Pick one of the repositories on the left</p>
+}
+else if (Repository == null)
 {
     <em>Loading...</em>
 }
