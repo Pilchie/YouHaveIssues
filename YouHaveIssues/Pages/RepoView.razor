@@ -11,15 +11,18 @@
 }
 else if (Repository == null)
 {
+    <h1>Issue counts for @Organization/@Name</h1>
     <em>Loading...</em>
 }
 else if (Repository.Exception != null)
 {
-    <h1>There was an error fetching this repository:</h1>
+    <h1>There was an error fetching @Organization/@Name</h1>
     <pre>@Repository.Exception.ToString()</pre>
 }
 else
 {
+    <h1>Issue counts for @Organization/@Name</h1>
+
     <div class="card-deck">
         <div class="row flex-nowrap" style="margin-bottom: 10px;">
             <div class="card">
