@@ -16,7 +16,7 @@ else if (Repository == null)
 else if (Repository.Exception != null)
 {
     <h1>There was an error fetching this repository:</h1>
-    <p>@Repository.Exception.ToString()</p>
+    <pre>@Repository.Exception.ToString()</pre>
 }
 else
 {
@@ -84,8 +84,9 @@ else
 
     protected Repository? Repository { get; private set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
+        Repository = null;
         if (Organization != null && Name != null)
         {
             Repository = await IssuesByRepository.GetRepository(Organization, Name);
