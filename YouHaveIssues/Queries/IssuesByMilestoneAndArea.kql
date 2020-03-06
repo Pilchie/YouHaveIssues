@@ -1,0 +1,17 @@
+declare query_parameters(Organization: string = "dotnet", Repository: string = "aspnetcore", AreaPrefix: string = "area-");
+
+Issue
+| project OrganizationLogin, RepositoryName, State, Number, MilestoneId, Title, IssueId, Labels, Data
+| where OrganizationLogin == Organization
+| where RepositoryName == Repository
+| where State == "open"
+| where extractjson("$.pull_request", Data) == ""
+| extend labels=parse_json(Labels)
+| mv-expand labels
+| where tostring(labels.name) startswith AreaPrefix or not(Labels contains AreaPrefix)
+| extend labelname = labels.name
+| extend Area = iff(labelname startswith AreaPrefix, labelname, "(No Area)")
+| lookup Milestone on MilestoneId
+| extend Milestone = iff(Title1 == "", "(No Milestone)", Title1)
+| summarize dcount(IssueId) by RepositoryName, Milestone, Area
+| order by RepositoryName asc, Milestone asc, Area asc

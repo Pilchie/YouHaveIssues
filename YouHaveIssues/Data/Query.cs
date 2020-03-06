@@ -10,13 +10,12 @@ namespace YouHaveIssues.Data
     {
         public string Name { get; }
 
-        public int Count => Issues.Count;
+        public int Count { get; }
 
-        public IList<Issue> Issues { get; } = new List<Issue>();
-
-        public Query(string name)
+        public Query(string name, int count)
         {
             Name = name;
+            Count = count;
         }
     }
 }

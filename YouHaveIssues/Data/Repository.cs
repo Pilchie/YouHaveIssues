@@ -17,17 +17,15 @@ namespace YouHaveIssues.Data
         public string Name { get; }
 
         public IList<Milestone> Milestones { get; }
-        public RateLimit? RateLimit { get; }
         public DateTimeOffset RefreshTime { get; }
 
         public IEnumerable<string> AllAreas => allAreas.Value;
 
-        public Repository(string organization, string name, IList<Milestone> milestones, RateLimit rateLimit, DateTimeOffset refreshTime)
+        public Repository(string organization, string name, IList<Milestone> milestones, DateTimeOffset refreshTime)
         {
             Organization = organization;
             Name = name;
             Milestones = milestones;
-            RateLimit = rateLimit;
             RefreshTime = refreshTime;
             allAreas = new Lazy<IEnumerable<string>>(() =>
                 new HashSet<string>(Milestones.SelectMany(m => m.Areas.Keys).OrderBy(a => a).ToList()));
