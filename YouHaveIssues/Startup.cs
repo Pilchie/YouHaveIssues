@@ -48,7 +48,6 @@ namespace YouHaveIssues
 
             services.Configure<KustoOptions>(Configuration.GetSection("Kusto"));
             services.AddSingleton<AzureAuthenticationService>();
-            //services.AddSingleton<KustoContextFactory>();
 
             // App Services for Containers options
             services.Configure<ForwardedHeadersOptions>(options =>
@@ -60,11 +59,12 @@ namespace YouHaveIssues
                 options.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("::ffff:172.16.0.0"), 108));
             });
 
-            var gitHubClient = new GitHubClient(new ProductHeaderValue("GitHubDashboard"))
-            {
-                Credentials = new Credentials(Configuration["GitHubToken"])
-            };
-            services.AddSingleton(new Data.IssuesByRepository(gitHubClient));
+            var repositoryConfig = new RepositoryConfig();
+            Configuration.Bind("RepositoryConfig", repositoryConfig);
+            services.AddSingleton(repositoryConfig);
+
+            services.AddSingleton<Data.IssuesByRepository>();
+            services.AddSingleton<KustoContextFactory>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

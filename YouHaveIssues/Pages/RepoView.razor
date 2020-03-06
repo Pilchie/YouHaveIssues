@@ -4,6 +4,7 @@
 @using YouHaveIssues.Data
 @using Humanizer
 @inject IssuesByRepository IssuesByRepository
+@inject KustoContextFactory KustoContextFactory
 
 @if (Organization == null || Name == null)
 {
@@ -74,7 +75,7 @@ else
 
     <p>
         <em>
-            Refreshed @Repository.RefreshTime.Humanize() | Rate Limit: @RateLimitInfo(Repository) | @GetBuildInfo()
+            Refreshed @@ @Repository.RefreshTime.ToLocalTime().ToString("t") (@Repository.RefreshTime.Humanize()) | @GetBuildInfo()
         </em>
     </p>
 }
@@ -92,7 +93,8 @@ else
         Repository = null;
         if (Organization != null && Name != null)
         {
-            Repository = await IssuesByRepository.GetRepository(Organization, Name);
+            var context = await KustoContextFactory.CreateContextAsync();
+            Repository = await IssuesByRepository.GetRepository(context, Organization, Name);
         }
     }
 
@@ -159,15 +161,5 @@ else
 
         var sha = Program.SourceVersion?.Substring(0, 6);
         return $"Built for branch {branch}@{sha}";
-    }
-
-    private static string RateLimitInfo(Repository repository)
-    {
-        if (repository.RateLimit == null)
-        {
-            return "unknown";
-        }
-
-        return $"{repository.RateLimit.Remaining} / {repository.RateLimit.Limit}(Resets in {(repository.RateLimit.Reset - DateTimeOffset.UtcNow).Humanize()})";
     }
 }
