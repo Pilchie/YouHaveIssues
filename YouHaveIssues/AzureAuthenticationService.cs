@@ -12,12 +12,12 @@ namespace YouHaveIssues
 {
     public class AzureAuthenticationService
     {
-        readonly SemaphoreSlim _acquireTokenLock = new SemaphoreSlim(initialCount: 1, maxCount: 1);
-        readonly IConfidentialClientApplication _app;
-        readonly ILogger<AzureAuthenticationService> _logger;
-        readonly string[] _scopes;
+        private readonly SemaphoreSlim _acquireTokenLock = new SemaphoreSlim(initialCount: 1, maxCount: 1);
+        private readonly IConfidentialClientApplication _app;
+        private readonly ILogger<AzureAuthenticationService> _logger;
+        private readonly string[] _scopes;
 
-        AuthenticationResult? _token;
+        private AuthenticationResult? _token;
 
         public AzureAuthenticationService(IOptionsMonitor<AzureADOptions> azureAdOptions, IOptions<KustoOptions> kustoOptions, ILogger<AzureAuthenticationService> logger)
         {
