@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace YouHaveIssues.Data
 {
@@ -15,7 +12,7 @@ namespace YouHaveIssues.Data
 
         public Milestone(string name)
         {
-            this.Name = name;
+            Name = name;
         }
     }
 }

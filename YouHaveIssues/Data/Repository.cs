@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace YouHaveIssues.Data
 {
@@ -34,7 +33,7 @@ namespace YouHaveIssues.Data
         {
             Organization = organization;
             Name = name;
-            this.Exception = exception;
+            Exception = exception;
 
             Milestones = Array.Empty<Milestone>();
             allAreas = new Lazy<IEnumerable<string>>(() => Enumerable.Empty<string>());

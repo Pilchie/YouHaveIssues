@@ -1,5 +1,4 @@
-﻿using Kusto.Cloud.Platform.Utils;
-using Kusto.Data;
+﻿using Kusto.Data;
 using Kusto.Data.Net.Client;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -10,9 +9,9 @@ namespace YouHaveIssues
 {
     public class KustoContextFactory
     {
-        readonly AzureAuthenticationService _azureAuth;
-        readonly IOptions<KustoOptions> _options;
-        readonly ILoggerFactory _loggerFactory;
+        private readonly AzureAuthenticationService _azureAuth;
+        private readonly IOptions<KustoOptions> _options;
+        private readonly ILoggerFactory _loggerFactory;
 
         public KustoContextFactory(AzureAuthenticationService azureAuth, IOptions<KustoOptions> options, ILoggerFactory loggerFactory)
         {
