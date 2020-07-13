@@ -1,0 +1,16 @@
+﻿declare query_parameters(Organization: string = "dotnet", Repository: string = "aspnetcore", AreaPrefix: string = "area-");
+
+IssueTimeline
+| project OrganizationLogin, RepositoryName, State, Number, MilestoneId, Title, IssueId, UpdatedAt, CreatedAt, ClosedAt, Labels, Data
+| where OrganizationLogin == Organization
+| where RepositoryName == Repository
+| where extractjson("$.pull_request", Data) == ""
+| extend labels=parse_json(Labels)
+| mv-expand labels
+| where tostring(labels.name) startswith AreaPrefix or not(Labels has AreaPrefix)
+| extend labelname = labels.name
+| extend Area = iff(labelname startswith AreaPrefix, labelname, "(No Area)")
+| extend milestone = extractjson("$.milestone.title", Data)
+| extend Milestone = iff(milestone == "", "(No Milestone)", milestone)
+| where UpdatedAt between(startofweek(ago(7d)) .. startofweek(now()))
+| order by Number asc, UpdatedAt asc

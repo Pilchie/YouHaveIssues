@@ -14,12 +14,11 @@ namespace YouHaveIssues
 {
     public class KustoContext
     {
-        static readonly ConcurrentDictionary<string, string> _queryCache = new ConcurrentDictionary<string, string>();
-
-        readonly ICslQueryProvider _query;
-        readonly ICslAdminProvider _admin;
-        readonly string _databaseName;
-        readonly ILogger _logger;
+        private static readonly ConcurrentDictionary<string, string> _queryCache = new ConcurrentDictionary<string, string>();
+        private readonly ICslQueryProvider _query;
+        private readonly ICslAdminProvider _admin;
+        private readonly string _databaseName;
+        private readonly ILogger _logger;
 
         public KustoContext(ICslQueryProvider query, ICslAdminProvider admin, string databaseName, ILogger logger)
         {
@@ -43,7 +42,21 @@ namespace YouHaveIssues
             return IssuesByRepository.FromReader(organization, reader);
         }
 
-        async Task<IDataReader> ExecuteQueryAsync<T>(string query, CancellationToken cancellationToken, params (string Name, object? Value)[] parameters)
+        public async Task<Timeline> IssueTimeline(string organization, string repository, string areaPrefix, CancellationToken cancellationToken = default)
+        {
+            _logger.LogDebug($"Sending Query: {nameof(IssueTimeline)}, ([{{Organization}}], [{{Repository}}])", organization, repository);
+            var reader = await ExecuteQueryAsync<Repository>(
+                GetQuery(nameof(IssueTimeline)),
+                cancellationToken,
+                ("Organization", organization),
+                ("Repository", repository),
+                ("AreaPrefix", areaPrefix));
+            _logger.LogDebug($"Query Complete: {nameof(IssueTimeline)}, ([{{Organization}}], [{{Repository}}])", organization, repository);
+
+            return AreaStatsByWeek.FromReader(reader);
+        }
+
+        private async Task<IDataReader> ExecuteQueryAsync<T>(string query, CancellationToken cancellationToken, params (string Name, object? Value)[] parameters)
         {
             // Yes yes, I know. We log things here though and can't return a task :(.
             static async void OnCancellation((KustoContext Context, string RequestId) state)
@@ -117,7 +130,7 @@ namespace YouHaveIssues
             return reader;
         }
 
-        string GetQuery(string name)
+        private string GetQuery(string name)
         {
             return _queryCache.GetOrAdd(name, n =>
             {
