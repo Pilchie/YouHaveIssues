@@ -1,0 +1,71 @@
+﻿@page "/Timeline/{Organization}/{Name}"
+@using YouHaveIssues.Data
+@inject AreaStatsByWeek AreaStatsByWeek
+@inject KustoContextFactory KustoContextFactory
+
+<h3>Timeline</h3>
+
+@if (Timeline == null)
+{
+    <em>Loading...</em>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Milestone</th>
+                <th>Area</th>
+                <th>Opened</th>
+                <th>Entered</th>
+                <th>Left</th>
+                <th>Closed</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var a in Timeline.AllAreas.OrderBy(a => a))
+            {
+                foreach (var m in Timeline.AllMilestones.OrderBy(m => m))
+                {
+                    @if (Timeline.AreaAndMilestone.TryGetValue((a, m), out var stats))
+                    {
+                        <tr style="background: @GetBackground();">
+                            <td>@a</td>
+                            <td>@m</td>
+                            <td>@stats.Opened</td>
+                            <td>@stats.Entered</td>
+                            <td>@stats.Left</td>
+                            <td>@stats.Closed</td>
+                        </tr>
+                    }
+                }
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter] public string? Organization { get; set; }
+
+    [Parameter] public string? Name { get; set; }
+
+    protected Timeline? Timeline { get; private set; }
+
+    private string? bgcolor;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Timeline = null;
+        if (Organization != null && Name != null)
+        {
+            var context = await KustoContextFactory.CreateContextAsync();
+            Timeline = await AreaStatsByWeek.GetStats(context, Organization, Name);
+        }
+    }
+
+    private string GetBackground()
+    {
+        bgcolor = bgcolor == "#FFFFFF" ? "#AAAAAA" : "#FFFFFF";
+        return bgcolor;
+    }
+}
