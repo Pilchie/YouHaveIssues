@@ -19,14 +19,11 @@ namespace UpdateTrendsTable
 
     public class UpdateIssuesTable
     {
-        private string _gitHubToken;
-        private string _connectionString;
+        private readonly IConfiguration _configuration;
 
         public UpdateIssuesTable(IConfiguration configuration)
         {
-            _gitHubToken = configuration["GitHubToken"];
-            _connectionString = configuration["ConnectionString"];
-
+            _configuration = configuration;
         }
 
         [FunctionName("UpdateIssuesTable")]
@@ -34,19 +31,35 @@ namespace UpdateTrendsTable
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
+            var gitHubToken = _configuration["GitHubToken"];
+            if (string.IsNullOrEmpty(gitHubToken))
+            {
+                log.LogError($"No GitHubToken configured");
+                return;
+            }
+
+            var connectionString = _configuration["ConnectionString"];
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                log.LogError($"No ConnectionString configured");
+                return;
+            }
+
             var ghc = new GitHubClient(new Connection(
                         new ProductHeaderValue("YouHaveIssues")))
             {
-                Credentials = new Credentials(_gitHubToken),
+                Credentials = new Credentials(gitHubToken),
             };
             var client = ghc.Issue;
             var issues = await client.GetAllForRepository("dotnet", "aspnetcore", new RepositoryIssueRequest { State = ItemStateFilter.Open, });
+            log.LogInformation($"Got {issues.Count} issues back from GitHub");
 
-            var storageAccount = CloudStorageAccount.Parse(_connectionString);
+            var storageAccount = CloudStorageAccount.Parse(connectionString);
             var tableClient = storageAccount.CreateCloudTableClient();
             var table = tableClient.GetTableReference("dotnet-aspnetcore");
             if (!await table.CreateIfNotExistsAsync())
             {
+                log.LogInformation("Created table");
             }
 
             var index = 0;
@@ -62,6 +75,7 @@ namespace UpdateTrendsTable
                     index++;
                 }
                 var result = await table.ExecuteBatchAsync(batch);
+                log.LogInformation($"Executed batch insert of {batch.Count} items.");
             }
         }
     }
