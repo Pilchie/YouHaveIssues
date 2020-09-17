@@ -27,7 +27,7 @@ namespace UpdateTrendsTable
         }
 
         [FunctionName("UpdateIssuesTable")]
-        public async Task Run([TimerTrigger("0 0 20 * * * ")] TimerInfo myTimer, ILogger log)
+        public async Task Run([TimerTrigger("0 30 20 * * * ")] TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
