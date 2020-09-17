@@ -17,12 +17,14 @@
 
   <ItemGroup>
     <PackageReference Include="Humanizer.Core" Version="2.7.9" />
+    <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.7" />
     <PackageReference Include="Microsoft.Azure.SignalR" Version="1.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.AzureAD.UI" Version="3.1.0" />
     <PackageReference Include="Microsoft.Azure.Kusto.Data" Version="8.0.7" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.8.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="3.1.1" />
+    <PackageReference Include="Radzen.Blazor" Version="2.10.20" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,5 +36,9 @@
       <_Parameter1>Build.SourceBranch</_Parameter1>
       <_Parameter2>$(GITHUB_REF)</_Parameter2>
     </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\YouHaveIssues.Shared.csproj" />
   </ItemGroup>
 </Project>
