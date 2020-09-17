@@ -26,8 +26,20 @@ namespace UpdateTrendsTable
             _configuration = configuration;
         }
 
+        [FunctionName("UpdateIssueTableOnDemand")]
+        [NoAutomaticTrigger]
+        public Task Run(ILogger log)
+        {
+            return RunTableUpdate(log);
+        }
+
         [FunctionName("UpdateIssuesTable")]
-        public async Task Run([TimerTrigger("0 30 20 * * * ")] TimerInfo myTimer, ILogger log)
+        public Task Run([TimerTrigger("0 0 10 * * *")] TimerInfo myTimer, ILogger log)
+        {
+            return RunTableUpdate(log);
+        }
+
+        private async Task RunTableUpdate(ILogger log)
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
