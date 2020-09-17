@@ -28,13 +28,13 @@ namespace UpdateTrendsTable
 
         [FunctionName("UpdateIssueTableOnDemand")]
         [NoAutomaticTrigger]
-        public Task Run(ILogger log)
+        public Task RunOnDemand(ILogger log)
         {
             return RunTableUpdate(log);
         }
 
-        [FunctionName("UpdateIssuesTable")]
-        public Task Run([TimerTrigger("0 0 10 * * *")] TimerInfo myTimer, ILogger log)
+        [FunctionName("UpdateIssuesTableOnTimer")]
+        public Task RunOnTimer([TimerTrigger("0 15 21 * * *")] TimerInfo myTimer, ILogger log)
         {
             return RunTableUpdate(log);
         }
