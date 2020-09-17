@@ -89,6 +89,8 @@ namespace UpdateTrendsTable
                 var result = await table.ExecuteBatchAsync(batch);
                 log.LogInformation($"Executed batch insert of {batch.Count} items.");
             }
+
+            log.LogInformation($"Done execution.");
         }
     }
 
