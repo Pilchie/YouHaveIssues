@@ -16,15 +16,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Humanizer.Core" Version="2.7.9" />
-    <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.7" />
-    <PackageReference Include="Microsoft.Azure.SignalR" Version="1.1.1" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.AzureAD.UI" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Azure.Kusto.Data" Version="8.0.7" />
-    <PackageReference Include="Microsoft.Identity.Client" Version="4.8.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="3.1.1" />
-    <PackageReference Include="Radzen.Blazor" Version="2.10.20" />
+    <PackageReference Include="Humanizer.Core" Version="2.8.26" />
+    <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.8" />
+    <PackageReference Include="Microsoft.Azure.SignalR" Version="1.5.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.AzureAD.UI" Version="3.1.8" />
+    <PackageReference Include="Microsoft.Azure.Kusto.Data" Version="8.1.5" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.18.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="3.1.8" />
+    <PackageReference Include="Radzen.Blazor" Version="2.14.0" />
   </ItemGroup>
 
   <ItemGroup>
