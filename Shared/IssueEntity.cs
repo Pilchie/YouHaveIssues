@@ -13,7 +13,7 @@ namespace YouHaveIssues.Shared
         { }
 
         public IssueEntity(Issue issue)
-            : base(DateTime.Today.ToString("O"), issue.Number.ToString("D"))
+            : base(DateTime.UtcNow.Date.ToString("yyyy-mm-dd"), issue.Number.ToString("D"))
         {
             this.Milestone = issue.Milestone?.Title ?? "";
             this.Labels = string.Join(";", issue.Labels.Select(l => l.Name).ToArray());
@@ -22,7 +22,7 @@ namespace YouHaveIssues.Shared
         }
 
         public DateTime Date
-            => DateTime.ParseExact(PartitionKey, "O", null);
+            => DateTime.ParseExact(PartitionKey, "yyyy-mm-dd", null);
 
         public int Number
             => int.Parse(RowKey);
