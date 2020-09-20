@@ -27,7 +27,7 @@ namespace YouHaveIssues.Data
             var storageAccount = CloudStorageAccount.Parse(connectionString);
             var tableClient = storageAccount.CreateCloudTableClient();
             var table = tableClient.GetTableReference("dotnet-aspnetcore");
-            var todayString = DateTime.Today.ToString("O");
+            var todayString = DateTime.UtcNow.Date.ToString("yyyy-mm-dd");
             var query = new TableQuery<IssueEntity>().Where(
                 TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, todayString));
             var issues = table.ExecuteQuery(query);
