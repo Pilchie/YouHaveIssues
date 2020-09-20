@@ -1,68 +1,15 @@
 ﻿@page "/Assignees/{Organization}/{Name}"
 @inject IConfiguration Configuration
-@using Microsoft.Azure.Cosmos.Table
-@using YouHaveIssues.Data
-@using YouHaveIssues.Shared
 
 <h3>Assignees</h3>
 
-<RadzenDropDown TValue="string" Data="@Milestones" Change="@AssigneeChanged"/>
+<RadzenDropDown @bind-Value="_currentMilestones" Data="@Milestones" Change="@MilestoneChanged" AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Multiple="true" Placeholder="Milestone..."/>
 
-<RadzenDropDown TValue="string" Data="@Areas" Change="@AreaChanged" />
+<RadzenDropDown @bind-Value="_currentAreas" Data="@Areas" Change="@AreaChanged" AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Multiple="true" Placeholder="Area..."/>
 
 <RadzenChart Style="">
     <RadzenPieSeries Data="@Counts" Title="Count by Assignee" CategoryProperty="Login" ValueProperty="Count" />
     <RadzenLegend Position="@LegendPosition.Bottom" />
 </RadzenChart>
 
-@code {
-    [Parameter] public string? Organization { get; set; }
-    [Parameter] public string? Name { get; set; }
-
-    string[]? Milestones { get; set; }
-    string[]? Areas { get; set; }
-
-    AssigneeCount[] Counts {get; set; }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        var connectionString = Configuration["ConnectionString"];
-        var todaysIssues = TodaysIssues.FetchFromTableStorage(connectionString);
-        Milestones = todaysIssues.AllMilestones.OrderBy(m => m).ToArray();
-        Areas = todaysIssues.AllAreas.OrderBy(a => a).ToArray();
-
-        var counts = new Dictionary<string, int>(StringComparer.Ordinal);
-        foreach (var i in todaysIssues.Issues)
-        {
-            foreach (var a in i.Assignees.Split(";", StringSplitOptions.RemoveEmptyEntries))
-            {
-                if (!counts.TryGetValue(a, out var c))
-                {
-                    c = 0;
-                }
-                counts[a] = ++c;
-            }
-        }
-
-        Counts = counts.Select(kvp => new AssigneeCount(kvp.Key, kvp.Value)).ToArray();
-    }
-
-    void AssigneeChanged(object o)
-    {
-    }
-
-    void AreaChanged(object o)
-    {
-    }
-
-    class AssigneeCount
-    {
-        public string Login { get; }
-        public int Count { get; }
-        public AssigneeCount(string login, int count)
-        {
-            Login = login;
-            Count = count;
-        }
-    }
-}
+<p>Found @Counts.Sum(a=>a.Count)</p>
