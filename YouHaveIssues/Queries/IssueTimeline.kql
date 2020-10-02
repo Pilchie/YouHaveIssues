@@ -1,10 +1,11 @@
 ﻿declare query_parameters(Organization: string = "dotnet", Repository: string = "aspnetcore", AreaPrefix: string = "area-");
 
 IssueTimeline
-| project OrganizationLogin, RepositoryName, State, Number, MilestoneId, Title, IssueId, UpdatedAt, CreatedAt, ClosedAt, Labels, Data
+| project OrganizationLogin, RepositoryName, State, Number, MilestoneId, Title, IssueId, UpdatedAt, CreatedAt, ClosedAt, Labels, Data, Action
 | where OrganizationLogin == Organization
 | where RepositoryName == Repository
 | where extractjson("$.pull_request", Data) == ""
+| where Action !in ("transferred", "deleted")
 | extend labels=parse_json(Labels)
 | mv-expand labels
 | where tostring(labels.name) startswith AreaPrefix or not(Labels has AreaPrefix)
