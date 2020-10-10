@@ -61,13 +61,18 @@ namespace YouHaveIssues.Pages
                     continue;
                 }
 
-                foreach (var a in i.Assignees.Split(";", StringSplitOptions.RemoveEmptyEntries))
+                foreach (var a in i.Assignees.Split(";", StringSplitOptions.None))
                 {
-                    if (!counts.TryGetValue(a, out var c))
+                    var assigneee = a;
+                    if (assigneee == "")
+                    {
+                        assigneee = "(unassigned)";
+                    }
+                    if (!counts.TryGetValue(assigneee, out var c))
                     {
                         c = 0;
                     }
-                    counts[a] = ++c;
+                    counts[assigneee] = ++c;
                 }
             }
 
