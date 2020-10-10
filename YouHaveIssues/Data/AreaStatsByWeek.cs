@@ -40,11 +40,12 @@ namespace YouHaveIssues.Data
                 //    : reader.GetDateTime(9);
                 // 10 - labels
                 // 11 - Data
-                // 12 - labels1
-                // 13 - labelname
-                var area = reader.GetString(14);
+                // 12 - Action
+                // 13 - labels1
+                // 14 - labelname
+                var area = reader.GetString(15);
                 // 15 - milestone
-                var milestone = reader.GetString(16);
+                var milestone = reader.GetString(17);
 
                 issueUpdates.GetOrNew(number).Add(new TimelineRow(updatedAt, state, milestone, area));
             }
