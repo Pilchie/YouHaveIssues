@@ -24,54 +24,19 @@ else
 {
     <h1>Issue counts for @Organization/@Name</h1>
 
-    <div class="card-deck">
-        <div class="row flex-nowrap" style="margin-bottom: 10px;">
-            <div class="card">
-                <div class="card-body"></div>
-            </div>
-
+    <RadzenGrid Data="@Repository" TItem="Area">
+        <Columns>
+            <RadzenGridColumn TItem="Area" Property="Name" Title="Area Name"/>
             @foreach (var m in Repository.Milestones)
             {
-                <div class="card bg-dark text-white">
-                    <div class="card-body"><h5 class="card-title text-center">@m.Name</h5></div>
-                </div>
+                <RadzenGridColumn TItem="Area" Title="@m.Name">
+                    <Template Context="data">
+                        <a href='@LinkFor(Repository, m, data.Name)' target="_blank" class="@BackgroundFor(@data[m.Name].Count)">@data[m.Name].Count</a>
+                    </Template>
+                </RadzenGridColumn>
             }
-        </div>
-        <div class="w-100"></div>
-
-        <div class="row flex-nowrap" style="margin-bottom: 10px;">
-            <div class="card bg-dark text-white">
-                <div class="card-body"><h5 class="card-title text-center">All</h5></div>
-            </div>
-            @foreach (var m in Repository.Milestones)
-            {
-                <div class="card @BackgroundFor(m.TotalCount)">
-                    <div class="card-body"><a href=@LinkFor(Repository, m) target="_blank"><h5 class="card-title text-center">@m.TotalCount</h5></a></div>
-                </div>
-            }
-
-        </div>
-        <div class="w-100"></div>
-
-
-        @foreach (var a in Repository.AllAreas)
-        {
-            <div class="row flex-nowrap" style="margin-bottom: 10px;">
-                <div class="card bg-dark text-white">
-                    <div class="card-body"><h5 class="card-title text-center">@AreaName(a)</h5></div>
-                </div>
-
-                @foreach (var m in Repository.Milestones)
-                {
-                    <div class="card @BackgroundFor(m, a)">
-                        <div class="card-body"><a href=@LinkFor(Repository, m, a) target="_blank"><h5 class="card-title text-center">@(m.Areas.TryGetValue(a, out var area) ? area.Count : 0)</h5></a></div>
-                    </div>
-                }
-            </div>
-            <div class="w-100"></div>
-
-        }
-    </div>
+        </Columns>
+    </RadzenGrid>
 
     <p>
         <em>
@@ -81,7 +46,6 @@ else
 }
 
 @code {
-
     [Parameter] public string? Organization { get; set; }
 
     [Parameter] public string? Name { get; set; }
@@ -107,21 +71,11 @@ else
                 : name;
     }
 
-    private static string? BackgroundFor(Milestone milestone, string areaName)
-    {
-        if (!milestone.Areas.TryGetValue(areaName, out var query))
-        {
-            return "bg-success";
-        }
-
-        return null;
-    }
-
     private static string? BackgroundFor(int count)
     {
         return count == 0
-            ? "bg-success"
-            : null;
+            ? "btn btn-success btn-small issue-count"
+            : "btn btn-primary btn-small issue-count";
     }
 
     private static string LinkFor(Repository repository, Milestone milestone)
@@ -134,10 +88,18 @@ else
 
     private static string LinkFor(Repository repository, Milestone milestone, string areaName)
     {
-        var a = areaName == IssuesByRepository.NoArea
-            ? $"-label%3A{string.Join("+-label%3A", repository.AllAreas.Except(new[] { IssuesByRepository.NoArea }).Select(a => Escape(a)))}"
-            : $"label%3A{areaName}";
-        return $"{LinkFor(repository, milestone)}+{a}";
+        var baseLink = LinkFor(repository, milestone);
+        if (areaName == "All")
+        {
+            return baseLink;
+        }
+        else
+        {
+            var a = areaName == IssuesByRepository.NoArea
+                ? $"-label%3A{string.Join("+-label%3A", repository.AllAreas.Except(new[] { IssuesByRepository.NoArea }).Select(a => Escape(a)))}"
+                : $"label%3A{areaName}";
+            return $"{baseLink}+{a}";
+        }
     }
 
     private static string Escape(string s)

@@ -182,7 +182,10 @@ app {
     }
 }
 
-.card {
-    height: 75px;
-    width: 210px;
+td, th {
+    text-align: center;
+}
+
+.issue-count {
+    width: 65px;
 }
