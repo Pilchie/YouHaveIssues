@@ -1,5 +1,8 @@
-﻿namespace YouHaveIssues.Data
+﻿using System.Diagnostics;
+
+namespace YouHaveIssues.Data
 {
+    [DebuggerDisplay("{GetDebuggerDisplay(),nq}")]
     public class Query
     {
         public string Name { get; }
@@ -11,5 +14,8 @@
             Name = name;
             Count = count;
         }
+
+        private string GetDebuggerDisplay()
+           => $"{Name} - {Count}";
     }
 }
