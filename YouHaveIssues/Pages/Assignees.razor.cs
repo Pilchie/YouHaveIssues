@@ -51,7 +51,7 @@ namespace YouHaveIssues.Pages
             var counts = new Dictionary<string, int>(StringComparer.Ordinal);
             foreach (var i in Issues)
             {
-                if (_currentAreas != null && !_currentAreas.Any(a => i.Labels.Contains(a)))
+                if (_currentAreas != null && !_currentAreas.Any(a => i.Labels is object && i.Labels.Contains(a)))
                 {
                     continue;
                 }
@@ -61,7 +61,7 @@ namespace YouHaveIssues.Pages
                     continue;
                 }
 
-                foreach (var a in i.Assignees.Split(";", StringSplitOptions.None))
+                foreach (var a in i.Assignees?.Split(";", StringSplitOptions.None) ?? Array.Empty<string>())
                 {
                     var assigneee = a;
                     if (assigneee == "")
