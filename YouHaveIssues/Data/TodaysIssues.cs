@@ -14,7 +14,7 @@ namespace YouHaveIssues.Data
             AllAreas = allAreas;
             AllMilestones = allMilestones;
             AllAssignees = allAssignees;
-            Issues = issues;
+            Issues = issues.ToList();
         }
 
         public HashSet<string> AllAreas { get; }
@@ -24,10 +24,15 @@ namespace YouHaveIssues.Data
 
         public static TodaysIssues FetchFromTableStorage(string connectionString)
         {
+            return FetchFromTableStorage(connectionString, DateTime.UtcNow.Date);
+        }
+
+        public static TodaysIssues FetchFromTableStorage(string connectionString, DateTime date)
+        {
             var storageAccount = CloudStorageAccount.Parse(connectionString);
             var tableClient = storageAccount.CreateCloudTableClient();
             var table = tableClient.GetTableReference("dotnet-aspnetcore");
-            var todayString = DateTime.UtcNow.Date.ToString("yyyy-mm-dd");
+            var todayString = date.ToString("yyyy-MM-dd");
             var query = new TableQuery<IssueEntity>().Where(
                 TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, todayString));
             var issues = table.ExecuteQuery(query);
@@ -36,7 +41,7 @@ namespace YouHaveIssues.Data
             var allAssignees = new HashSet<string>(StringComparer.Ordinal);
             foreach (var issue in issues)
             {
-                foreach (var label in issue.Labels.Split(";", StringSplitOptions.RemoveEmptyEntries))
+                foreach (var label in issue.Labels?.Split(";", StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>())
                 {
                     if (label.StartsWith("area-", StringComparison.Ordinal))
                     {
@@ -44,9 +49,9 @@ namespace YouHaveIssues.Data
                     }
                 }
 
-                allMilestones.Add(issue.Milestone);
+                allMilestones.Add(issue.Milestone ?? "");
 
-                foreach (var assignee in issue.Assignees.Split(";", StringSplitOptions.RemoveEmptyEntries))
+                foreach (var assignee in issue.Assignees?.Split(";", StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>())
                 {
                     allAssignees.Add(assignee);
                 }

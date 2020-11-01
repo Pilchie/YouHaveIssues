@@ -1,0 +1,13 @@
+@page "/TestFailures"
+@inject IConfiguration Configuration
+
+<p>Open Issues: @TotalOpenCount</p>
+<p>Closed: @ClosedThisWeekCount</p>
+<p>Opened: @OpenedThisWeekCount</p>
+
+<RadzenGrid Data="@GridData">
+    <Columns>
+        <RadzenGridColumn Property="LastWeek" Title="Last Week" TItem="@Row" />
+        <RadzenGridColumn Property="ThisWeek" Title="This Week" TItem="@Row" />
+    </Columns>
+</RadzenGrid>
