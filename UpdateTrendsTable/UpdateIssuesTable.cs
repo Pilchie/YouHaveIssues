@@ -34,7 +34,7 @@ namespace UpdateTrendsTable
         }
 
         [FunctionName("UpdateIssuesTableOnTimer")]
-        public Task RunOnTimer([TimerTrigger("0 15 21 * * *")] TimerInfo myTimer, ILogger log)
+        public Task RunOnTimer([TimerTrigger("0 15 01 * * *")] TimerInfo myTimer, ILogger log)
         {
             return RunTableUpdate(log);
         }
