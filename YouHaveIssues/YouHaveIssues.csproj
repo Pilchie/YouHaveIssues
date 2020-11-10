@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>0d46fac9-2d16-49df-8482-5e8849e105a0</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <Nullable>enable</Nullable>
@@ -20,10 +20,10 @@
     <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.8" />
     <PackageReference Include="Microsoft.Azure.SignalR" Version="1.5.1" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.AzureAD.UI" Version="3.1.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.AzureAD.UI" Version="5.0.0" />
     <PackageReference Include="Microsoft.Azure.Kusto.Data" Version="8.1.5" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.18.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="3.1.8" />
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="5.0.0" />
     <PackageReference Include="Radzen.Blazor" Version="2.14.0" />
   </ItemGroup>
 
