@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication.AzureAD.UI;
+﻿using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Client;
+using Microsoft.Identity.Web;
 using System;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -10,6 +12,13 @@ using System.Threading.Tasks;
 
 namespace YouHaveIssues
 {
+    public class AzureADOptions
+    {
+        public string? ClientId { get; set; }
+        public string? ClientSecret { get; set; }
+        public string? TenantId { get; set; }
+    }
+
     public class AzureAuthenticationService
     {
         private readonly SemaphoreSlim _acquireTokenLock = new SemaphoreSlim(initialCount: 1, maxCount: 1);
@@ -23,7 +32,7 @@ namespace YouHaveIssues
         {
             _logger = logger;
 
-            var adOptions = azureAdOptions.Get(AzureADDefaults.AuthenticationScheme);
+            var adOptions = azureAdOptions.CurrentValue;
 
             var builder = ConfidentialClientApplicationBuilder.Create(adOptions.ClientId)
                 .WithTenantId(adOptions.TenantId);
@@ -42,6 +51,10 @@ namespace YouHaveIssues
                 {
                     _logger.LogInformation("Authenticating using Certificate '{Thumbprint}'", certificate.Thumbprint);
                     builder = builder.WithCertificate(certificate);
+                }
+                else
+                {
+                    _logger.LogError("No ClientSecret or Certificate configured");
                 }
             }
 
