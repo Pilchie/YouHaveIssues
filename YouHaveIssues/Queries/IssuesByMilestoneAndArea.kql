@@ -9,8 +9,22 @@ Issue
 | where extractjson("$.pull_request", Data) == ""
 | extend labels=parse_json(Labels)
 | mv-expand labels
-| where tostring(labels.name) startswith AreaPrefix or not(Labels contains AreaPrefix)
-| extend labelname = labels.name
+| extend labelname = tostring(labels.name)
+| where labels.name startswith AreaPrefix or not(Labels has AreaPrefix)
+| extend labelname = iff(labelname == "area-azure", "area-runtime", labelname)
+| extend labelname = iff(labelname == "area-caching", "area-runtime", labelname)
+| extend labelname = iff(labelname == "area-dataprotection", "area-runtime", labelname)
+| extend labelname = iff(labelname == "area-healthchecks", "area-runtime", labelname)
+| extend labelname = iff(labelname == "area-hosting", "area-runtime", labelname)
+| extend labelname = iff(labelname == "area-httpclientfactory", "area-runtime", labelname)
+| extend labelname = iff(labelname == "area-identity", "area-runtime", labelname)
+| extend labelname = iff(labelname == "area-middleware", "area-runtime", labelname)
+| extend labelname = iff(labelname == "area-security", "area-runtime", labelname)
+| extend labelname = iff(labelname == "area-servers", "area-runtime", labelname)
+| extend labelname = iff(labelname == "area-websockets", "area-runtime", labelname)
+| extend labelname = iff(labelname == "area-razortooling", "area-razor.tooling", labelname)
+| extend labelname = iff(labelname == "area-platform", "area-infrastructure", labelname)
+| extend labelname = iff(labelname == "area-installers", "area-infrastructure", labelname)
 | extend Area = iff(labelname startswith AreaPrefix, labelname, "(No Area)")
 | lookup Milestone on MilestoneId
 | extend Milestone = iff(Title1 == "", "(No Milestone)", Title1)
