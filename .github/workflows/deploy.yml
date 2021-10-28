@@ -31,5 +31,5 @@ jobs:
       uses: azure/webapps-deploy@v2
       with: 
         app-name: YouHaveIssues
-        publish-profile: ${{ secrets.azureWebAppPublishProfile }}
+        publish-profile: ${{ secrets.PUBLISHPROFILE }}
         package: ${{env.DOTNET_ROOT}}/myapp 
