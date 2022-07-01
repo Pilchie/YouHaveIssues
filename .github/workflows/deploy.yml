@@ -14,15 +14,11 @@ jobs:
     # checkout the repo
     - uses: actions/checkout@v2
     
-    - name: Setup dotnet 3.1.x
+    - name: Setup dotnet
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '3.1.x'
-    - name: Setup dotnet 5.0.x
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '5.0.x'
-    
+        dotnet-version: '6.0.x'
+
     # dotnet build and publish
     - name: dotnet publish
       run: |
