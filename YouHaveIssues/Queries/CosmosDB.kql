@@ -1,0 +1,25 @@
+﻿let OpenIssueData=cluster('https://1es.kusto.windows.net').database('GitHub').Issue
+| where OrganizationLogin == "Azure"
+| where RepositoryName in ("azure-sdk-for-java", "azure-sdk-for-go", "azure-sdk-for-python", "azure-sdk-for-js")
+| where State == "open"
+| where Action !in ("transferred", "deleted")
+| extend PullRequestData=extractjson("$.pull_request", Data)
+| extend IsIssue = isempty(PullRequestData)
+| where IsIssue
+| extend x = parse_json(Labels)
+| mv-expand x
+| where extractjson("$.name", tostring(x)) == "Cosmos"
+| project RepositoryName, Number, HtmlUrl, Title, OwnerLogin, x, IsIssue, Data, PullRequestData
+| summarize OpenIssues=dcount(Number) by RepositoryName;
+let OpenPRData=cluster('https://1es.kusto.windows.net').database('GitHub').PullRequest
+| where OrganizationLogin == "Azure"
+| where RepositoryName in ("azure-sdk-for-java", "azure-sdk-for-go", "azure-sdk-for-python", "azure-sdk-for-js")
+| where State == "open"
+| extend x = parse_json(Labels)
+| mv-expand x
+| where extractjson("$.name", tostring(x)) == "Cosmos"
+| project Number, HtmlUrl, Title, UserLogin, RepositoryName
+| summarize OpenPRs=dcount(Number) by RepositoryName;
+OpenIssueData
+| join kind=fullouter OpenPRData on RepositoryName
+| project-away RepositoryName1

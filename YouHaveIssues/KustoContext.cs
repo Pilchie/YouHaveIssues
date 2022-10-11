@@ -31,7 +31,7 @@ namespace YouHaveIssues
         public async Task<IReadOnlyList<Repository>> IssuesByMilestoneAndArea(string organization, string repository, string areaPrefix, CancellationToken cancellationToken = default)
         {
             _logger.LogDebug($"Sending Query: {nameof(IssuesByMilestoneAndArea)}, ([{{Organization}}], [{{Repository}}])", organization, repository);
-            var reader = await ExecuteQueryAsync<Repository>(
+            var reader = await ExecuteQueryAsync(
                 GetQuery(nameof(IssuesByMilestoneAndArea)),
                 cancellationToken,
                 ("Organization", organization),
@@ -42,10 +42,20 @@ namespace YouHaveIssues
             return IssuesByRepository.FromReader(organization, reader);
         }
 
+        public async Task<CosmosData> GetCosmosData(CancellationToken cancellationToken = default)
+        {
+            _logger.LogDebug($"Sending Query: {nameof(GetCosmosData)}");
+            var reader = await ExecuteQueryAsync(
+            GetQuery("CosmosDB"),
+                cancellationToken);
+            _logger.LogDebug($"Query Complete: {nameof(GetCosmosData)}");
+            return CosmosData.FromReader(reader);
+        }
+
         public async Task<Timeline> IssueTimeline(string organization, string repository, string areaPrefix, CancellationToken cancellationToken = default)
         {
             _logger.LogDebug($"Sending Query: {nameof(IssueTimeline)}, ([{{Organization}}], [{{Repository}}])", organization, repository);
-            var reader = await ExecuteQueryAsync<Repository>(
+            var reader = await ExecuteQueryAsync(
                 GetQuery(nameof(IssueTimeline)),
                 cancellationToken,
                 ("Organization", organization),
@@ -56,7 +66,7 @@ namespace YouHaveIssues
             return AreaStatsByWeek.FromReader(reader);
         }
 
-        private async Task<IDataReader> ExecuteQueryAsync<T>(string query, CancellationToken cancellationToken, params (string Name, object? Value)[] parameters)
+        private async Task<IDataReader> ExecuteQueryAsync(string query, CancellationToken cancellationToken, params (string Name, object? Value)[] parameters)
         {
             // Yes yes, I know. We log things here though and can't return a task :(.
             static async void OnCancellation((KustoContext Context, string RequestId) state)
