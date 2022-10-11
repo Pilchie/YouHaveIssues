@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Queries\CosmosDB.kql" />
     <None Remove="Queries\IssueTimeline.kql" />
   </ItemGroup>
 

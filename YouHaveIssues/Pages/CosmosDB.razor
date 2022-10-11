@@ -1,0 +1,43 @@
+@page "/CosmosDB"
+@using YouHaveIssues.Data
+@inject KustoContextFactory KustoContextFactory
+
+<h1>CosmosDB SDK Issues and PRs</h1>
+
+@if (CosmosData is null)
+{
+    <em>Loading...</em>
+}
+else if (CosmosData.Exception is not null)
+{
+    <h2>Error loading CosmosDB SDK data:</h2>
+    <pre>@CosmosData.Exception.ToString()</pre>
+}
+else
+{
+   <RadzenGrid Data="@CosmosData.Repositories" TItem="CosmosRepository">
+        <Columns>
+            <RadzenGridColumn TItem="CosmosRepository" Property="Name" Title="Repository" />
+            <RadzenGridColumn TItem="CosmosRepository" Property="Issues" Title="Issues">
+                <Template Context="data">
+                    <a href='@($"https://github.com/Azure/{data.Name}/issues?q=is%3Aissue+is%3Aopen+label%3ACosmos")' target="_blank">@data.Issues</a>
+                </Template>
+            </RadzenGridColumn>
+            <RadzenGridColumn TItem="CosmosRepository" Property="PullRequests" Title="PullRequests">
+                <Template Context="data">
+                    <a href='@($"https://github.com/Azure/{data.Name}/pulls?q=is%3Apr+is%3Aopen+label%3ACosmos")' target="_blank">@data.PullRequests</a>
+                </Template>
+            </RadzenGridColumn>
+        </Columns>
+    </RadzenGrid>    
+}
+
+        @code {
+    CosmosData? CosmosData = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var context = await KustoContextFactory.CreateContextAsync();
+        CosmosData = await context.GetCosmosData();
+    }
+}
